@@ -1,0 +1,77 @@
+---
+title: "Linear regression"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+
+set.seed(1)
+
+```
+
+```{r}
+data("nyc_airbnb")
+
+nyc_airbnb = 
+  nyc_airbnb %>% 
+  mutate(stars = review_scores_location / 2) %>% 
+  rename(
+    borough = neighbourhood_group,
+    neighborhood = neighbourhood) %>% 
+  filter(borough != "Staten Island") %>% 
+  select(price, stars, borough, neighborhood, room_type)
+```
+
+##Fit a miodel
+
+```{r}
+nyc_airbnb %>% 
+  ggplot(aes(x = stars, y = price, color = borough)) +
+  geom_point()
+```
+
+fit a model we care about 
+```{r, include = FALSE}
+
+fit <-  lm(price ~ stars + borough, data = nyc_airbnb)
+
+summary(fit)
+summary(fit)$coef
+coef(fit)
+fitted.values(fit)
+residuals(fit)
+
+```
+
+lets look at the results better
+```{r}
+broom::glance(fit)
+
+broom::tidy(fit) %>% 
+  select(-std.error, -statistic) %>% 
+  mutate(
+    term = str_replace(term, "borough", "Borough: ")
+  ) %>% 
+  knitr::kable(dight = 3)
+
+
+```
+
+
+##Be in control of factors
+
+```{r}
+nyc_airbnb <- 
+  nyc_airbnb %>% 
+  mutate(
+    borough = fct_infreq(borough),
+    room_type = fct_infreq(room_type))
+    
+  
+```
+Look at the plot again 
+```{r}
+
+```
+
